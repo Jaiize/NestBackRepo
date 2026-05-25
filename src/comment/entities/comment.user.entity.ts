@@ -14,9 +14,6 @@ import {
 } from 'typeorm';
 
 @Entity()
-@Index(['room'])
-@Index(['user'])
-@Index(['parent'])
 export class CommentUser {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -29,6 +26,7 @@ export class CommentUser {
   room!: Room;
 
   @Column({ type: 'int', name: 'room_joiner' })
+  @Index()
   roomId!: number;
 
   @ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' })
@@ -36,9 +34,11 @@ export class CommentUser {
   user!: User;
 
   @Column({ type: 'int', name: 'user_commented' })
+  @Index()
   userId!: number;
 
   @Column({ type: 'int', nullable: true, name: 'parent_id' })
+  @Index()
   parentId!: number;
 
   @ManyToOne(() => CommentUser, (commentUser) => commentUser.replies, {
@@ -53,13 +53,6 @@ export class CommentUser {
 
   @OneToMany(() => CommentUser, (commentUser) => commentUser.parent)
   replies!: CommentUser[];
-
-  // The three below properties seem useless
-  likeCount!: number;
-
-  dislikeCount!: number;
-
-  userReaction!: 'like' | 'dislike' | null;
 
   @CreateDateColumn({ type: 'timestamp', update: false })
   createdAt!: Date;

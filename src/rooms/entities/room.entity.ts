@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -22,6 +23,7 @@ export class Room {
   id!: number;
 
   @Column({ type: 'varchar', length: 3, nullable: false })
+  @Index()
   roomNumber!: string;
 
   @Column({ type: 'varchar', nullable: false })
@@ -40,21 +42,27 @@ export class Room {
   postReact!: PostReact[];
 
   @Column({ type: 'int' })
+  @Index()
   price!: number;
 
   @Column({ type: 'date' })
+  @Index()
   checkinTime!: Date;
 
   @Column({ type: 'date' })
+  @Index()
   checkoutTime!: Date;
 
   @Column({ type: 'int' })
+  @Index()
   rating!: number;
 
   @Column({ type: 'enum', enum: Status, default: Status.AVAILABLE })
+  @Index()
   status!: Status;
 
   @CreateDateColumn({ type: 'timestamp', update: false })
+  @Index()
   created_at!: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })

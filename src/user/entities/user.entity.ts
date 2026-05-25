@@ -7,6 +7,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Index
 } from 'typeorm';
 import { Follower } from './follower.entity';
 import { FileEntity } from 'src/file/entities/file.entity';
@@ -23,9 +24,11 @@ export class User {
   name!: string;
 
   @Column({ type: 'varchar', length: 20 })
+  @Index()
   username!: string;
 
   @Column({ type: 'varchar', length: 40, unique: true })
+  @Index()
   email!: string;
 
   @Column({ type: 'varchar', nullable: true })
@@ -35,6 +38,7 @@ export class User {
   age!: number;
 
   @Column({ type: 'enum', enum: ['m', 'f', 'u'] })
+  @Index()
   gender!: string;
 
   @Column({ type: 'varchar' })
@@ -66,15 +70,18 @@ export class User {
   postlikes!: PostReact[];
 
   @CreateDateColumn({ type: 'timestamp', update: false })
+  @Index()
   created_at!: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
 
   @Column({ type: 'boolean', default: false })
+  @Index()
   isAdmin!: boolean;
 
   @Column({ type: 'boolean', default: false })
+  @Index()
   canPost!: boolean;
 }
 

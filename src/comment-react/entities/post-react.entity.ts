@@ -15,8 +15,6 @@ import { ReactionType } from './comment-react.entity';
 
 @Entity()
 @Unique(['user', 'room'])
-@Index(['user'])
-@Index(['room'])
 export class PostReact {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -26,6 +24,7 @@ export class PostReact {
   user!: User;
 
   @Column({ type: 'varchar', name: 'user_who_post_reacted' })
+  @Index()
   ownerId!: string;
 
   @ManyToOne(() => Room, (room) => room.postReact, {
@@ -35,11 +34,14 @@ export class PostReact {
   room!: Room;
 
   @Column({ type: 'varchar', name: 'post_reacted_on' })
+  @Index()
   postId!: number;
 
   @Column({ type: 'enum', enum: ReactionType })
+  @Index()
   type!: ReactionType;
 
   @CreateDateColumn({ type: 'timestamp', update: false })
+  @Index()
   createdAt!: Date;
 }

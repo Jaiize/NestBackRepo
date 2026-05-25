@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 
 @Entity()
@@ -25,6 +26,7 @@ export class Family {
   user!: User;
 
   @Column({ type: 'varchar', name: 'family_id' })
+  @Index()
   ownerId!: string;
 
   @Column({ type: 'varchar', array: true, nullable: true })
@@ -46,6 +48,7 @@ export class Family {
   uncles!: string[];
 
   @CreateDateColumn({ type: 'timestamp', update: false })
+  @Index()
   created_at!: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })

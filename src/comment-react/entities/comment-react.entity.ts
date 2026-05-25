@@ -42,8 +42,10 @@ export class CommentReact {
   commentId!: number;
 
   @Column({ type: 'enum', enum: ReactionType })
+  @Index()
   type!: ReactionType;
 
   @CreateDateColumn({ type: 'timestamp', update: false })
+  @Index()
   createdAt!: Date;
 }
