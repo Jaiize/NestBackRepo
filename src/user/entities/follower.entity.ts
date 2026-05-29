@@ -12,8 +12,6 @@ import { User } from './user.entity';
 
 @Entity()
 @Index(['followerUser', 'followingUser'], { unique: true })
-@Index(['followingUser', 'createdAt'])
-@Index(['followerUser', 'createdAt'])
 export class Follower {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -23,6 +21,7 @@ export class Follower {
   followerUser!: User;
 
   @Column({ type: 'varchar', name: 'follower_id' })
+  @Index()
   followerId!: string;
 
   @ManyToOne(() => User, (user) => user.followers, { onDelete: 'CASCADE' })
@@ -30,9 +29,11 @@ export class Follower {
   followingUser!: User;
 
   @Column({ type: 'varchar', name: 'following_id' })
+  @Index()
   followingId!: string;
 
   @CreateDateColumn({ type: 'timestamp', update: false })
+  @Index()
   createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
