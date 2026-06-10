@@ -1,21 +1,79 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { UserService } from './user/user.service';
+import { TokenService } from './token/token.service';
 
-@WebSocketGateway()
-export class WebSocketGate implements OnGatewayConnection, OnGatewayDisconnect {
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
+export class WebSocketGate
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   @WebSocketServer() server!: Server;
 
-  handleConnection(client: Socket) {}
+  constructor(
+    private readonly userServ: UserService,
+    private tokenServ: TokenService,
+  ) {}
 
-  handleDisconnect(client: Socket) {}
+  afterInit(server: any) {
+    setInterval(() => {
+      // this.server.emit('Connection', {
+      //   timestamp: new Date().toLocaleString('en_US', {
+      //     hour: '2-digit',
+      //     minute: '2-digit',
+      //   }),
+      // });
+      return {
+        Status: 'Ok',
+        echo: 'Still Connected',
+        timestamp: new Date().toLocaleString('en_US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      };
+    }, 5000);
+  }
 
-  handleDelete(itemId: number) {
-    this.server.emit('deleteItem', itemId);
+  @SubscribeMessage('users')
+  getUsers(@ConnectedSocket() client: Socket) {
+    // client.emit('received', { echo: "Users data" })
+    const user = this.userServ.findAll();
+    return { clientId: client.id, echo: user };
+  }
+
+  @SubscribeMessage('user')
+  getUser(@MessageBody() login: string, @ConnectedSocket() client: Socket) {
+    // client.emit('received', { result: user })
+    const user = this.userServ.findOneWithQuery(login);
+    return { clientId: client.id, echo: user };
+  }
+
+  handleConnection(client: Socket) {
+    const rawToken = client.handshake.auth.token as string;
+    const [type, token] = rawToken.split(' ') ?? [];
+    const payload = this.tokenServ.verifyTokenForAuth(
+      type === 'Bearer' ? token : '',
+    );
+    if (payload) {
+      client.emit('Welcome', { Message: 'Connected to NestJs application' });
+      return { Succces: 'Ok', echo: 'Connected to NestJs application' };
+    }
+  }
+
+  handleDisconnect(client: Socket) {
+    client.disconnect();
   }
 }
 

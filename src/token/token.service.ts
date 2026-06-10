@@ -9,7 +9,7 @@ export class TokenService {
   generateToken(user: SignIn) {
     const payload = { user: user.login };
     return this.jwtServ.sign(payload, {
-      issuer: 'Tosin Emmanuel',
+      issuer: 'Jaize',
       algorithm: 'HS384',
     });
   }
@@ -27,32 +27,27 @@ export class TokenService {
       const tokenTaken = token.split(' ')[1];
       const payload = this.jwtServ.verify<object>(tokenTaken);
       if (payload !== null) {
-        // Check
         const { user } = payload as { user: string; iat: number; iss: string };
         return user;
       }
-    } catch (error) {
-      throw new UnauthorizedException(error);
+    } catch (e) {
+      console.error(e);
+      throw new UnauthorizedException();
     }
   }
 
-  verifyTokenForTest(token: string) {
+  verifyTokenForAuth(token: string) {
     try {
-      const tokenTaken = token.split(' ')[1];
-      const payload = this.jwtServ.verify<object>(tokenTaken);
+      const payload = this.jwtServ.verify<object>(token);
       if (payload !== null) {
         return payload;
       }
-    } catch (error) {
-      throw new UnauthorizedException(error);
+    } catch (e) {
+      console.error(e);
+      throw new UnauthorizedException();
     }
   }
 
-  signOut(payload: object): string {
-    //  Just for testing purposes, logout mechanism can be handled at client side!
-    // 60, "2 days", "10h", "7d"
-    return this.jwtServ.sign(payload, { expiresIn: 0 });
-  }
 }
 
 // JwtPayload properties

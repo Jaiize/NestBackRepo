@@ -16,8 +16,7 @@ import {
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { Room } from './entities/room.entity';
-import { Response, Request } from 'express';
-import { WebSocketGate } from 'src/WebSocketGate';
+import { Response } from 'express';
 import { PoliciesGuard } from 'src/auth/Policies.Guard';
 import { CheckPolicies } from 'src/auth/Policy.check';
 
@@ -29,13 +28,10 @@ import { Public } from 'src/auth/public.decorator';
 // import { User } from 'src/user/entities/user.entity';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-// @ApiTags('api/rooms')
+@ApiTags('api/rooms')
 @Controller('api/rooms')
 export class RoomsController {
-  constructor(
-    private readonly roomsService: RoomsService,
-    private readonly webSocket: WebSocketGate,
-  ) {}
+  constructor(private readonly roomsService: RoomsService) {}
 
   @UseGuards(PoliciesGuard)
   @CheckPolicies(new PolicyCreate())
@@ -47,9 +43,6 @@ export class RoomsController {
   @ApiOperation({ summary: 'Get all rooms' })
   @ApiResponse({ status: '2XX', description: 'Rooms retrieved successfully' })
   @ApiResponse({ status: '4XX', description: 'Forbidden' })
-  // @Public()
-  // @UseGuards(PoliciesGuard)
-  // @CheckPolicies(new PolicyCreate())
   @Get()
   async toFindAll(): Promise<Room[]> {
     return await this.roomsService.findAll();
@@ -88,7 +81,6 @@ export class RoomsController {
   @Delete(':id')
   async toRemove(@Param('id') id: number): Promise<Room[] | undefined> {
     const result = await this.roomsService.remove(id);
-    this.webSocket.handleDelete(id);
     return result;
   }
 }

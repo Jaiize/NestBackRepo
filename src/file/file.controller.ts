@@ -14,6 +14,7 @@ import { CreateFileDto } from './dto/create-file.dto';
 import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { Readable } from 'stream';
 import { diskStorage } from 'multer';
 // import { UpdateFileDto } from './dto/update-file.dto';
 
@@ -50,8 +51,9 @@ export class FileController {
     /**
      * Not tested yet!
      */
-    // res.set('Content-Type', result[1] as string);
-    res.send(result[0]);
+    res.json(result)
+    // const stream = (await result).Body as Readable;
+    // Readable.from((await result).Body).pipe(res)
   }
 
   // @Get()

@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtGuard } from './jwt.guard';
+import { UserGqlService } from './user-gql.service';
 
-describe('JwtGuard', () => {
-  let service: JwtGuard;
+describe('UserGqlService', () => {
+  let service: UserGqlService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [JwtGuard],
+      providers: [UserGqlService],
     }).compile();
 
-    service = module.get<JwtGuard>(JwtGuard);
+    service = module.get<UserGqlService>(UserGqlService);
   });
 
   it('should be defined', () => {

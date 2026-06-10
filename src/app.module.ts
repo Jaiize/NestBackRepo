@@ -16,7 +16,6 @@ import { JwtAuthGuard } from './auth/jwt-strategy/jwt.auth.guard';
 import { CustomConfiguration } from './custom.Config.Service';
 import { FileModule } from './file/file.module';
 import { FileEntity } from './file/entities/file.entity';
-import { S3Client } from '@aws-sdk/client-s3';
 import { Follower } from './user/entities/follower.entity';
 // import { TypeormConfig } from './login.details';
 import { CommentModule } from './comment/comment.module';
@@ -24,10 +23,14 @@ import { CommentUser } from './comment/entities/comment.user.entity';
 import { CommentReactModule } from './comment-react/comment-react.module';
 import { CommentReact } from './comment-react/entities/comment-react.entity';
 import { PostReact } from './comment-react/entities/post-react.entity';
+import { UserGqlModule } from './GraphQl/user-gql/user-gql.module';
+import { TokenService } from './token/token.service';
+import { UserService } from './user/user.service';
 
 @Module({
   imports: [
-    AuthModule,
+    // Work on this
+    TypeOrmModule.forFeature([User, Follower]),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -54,32 +57,24 @@ import { PostReact } from './comment-react/entities/post-react.entity';
       logging: true,
     }),
     UserModule,
+    AuthModule,
     RoomsModule,
     FamilyModule,
     TokenModule,
     FileModule,
     CommentModule,
     CommentReactModule,
+    UserGqlModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     CustomConfiguration,
+    TokenService,
+    UserService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    },
-    {
-      provide: S3Client,
-      useFactory: () => {
-        return new S3Client({
-          region: 'my_region_here',
-          credentials: {
-            accessKeyId: 'My_accessKeyId_here',
-            secretAccessKey: 'My_secretAccessKey_here',
-          },
-        });
-      },
     },
   ],
   exports: [CustomConfiguration],
