@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { Field, InputType, Int, registerEnumType } from '@nestjs/graphql';
+import { Gender } from './UserObj';
 import {
   IsAlphanumeric,
   IsEmail,
-  IsEnum,
   IsInt,
   IsNotEmpty,
   IsString,
@@ -10,40 +10,34 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateUserDto {
-  @ApiProperty()
-  @IsString()
+registerEnumType(Gender, { name: 'Gender' });
+
+@InputType()
+export class UserInput {
+  @Field()
   @IsNotEmpty()
+  @IsString()
   @MinLength(9, { message: 'Name cannot be less than nine characters!' })
   name!: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
+  @Field()
   @IsString()
+  @IsEmail()
+  @IsNotEmpty({ message: "Email field can't be empty" })
+  email!: string;
+
+  @Field()
+  @IsString()
+  @IsNotEmpty()
   @MinLength(3, { message: 'Username must have atleast three characters!' })
   @IsAlphanumeric('en-US', {
     message: 'Username must be alphaNumeric characters!',
   })
   username!: string;
 
-  @ApiProperty()
-  @IsInt()
-  age!: number;
-
-  @ApiProperty()
-  @IsString()
-  @IsEmail()
-  @IsNotEmpty({ message: "Email field can't be empty" })
-  email!: string;
-
-  @ApiProperty()
+  @Field()
   @IsNotEmpty()
-  @IsEnum(['m', 'f', 'u'])
-  gender!: string;
-
-  @ApiProperty()
   @IsString()
-  @IsNotEmpty()
   @IsStrongPassword(
     {
       minLength: 8,
@@ -58,4 +52,16 @@ export class CreateUserDto {
     },
   )
   password!: string;
+
+  @Field({ nullable: true })
+  @IsString()
+  picture!: string;
+
+  @Field(() => Int)
+  @IsInt()
+  age!: number;
+
+  @Field(() => Gender)
+  @IsNotEmpty()
+  gender!: Gender;
 }

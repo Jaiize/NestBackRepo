@@ -15,17 +15,23 @@ import { PoliciesGuard } from 'src/auth/Policies.Guard';
 import { CheckPolicies } from 'src/auth/Policy.check';
 import { PolicyManage } from 'src/auth/casl/casl-manage.factory/Policy.manage';
 import { ChangePass } from 'src/login.details';
-import { Public } from 'src/auth/public.decorator';
+import { Public, UserIntel } from 'src/auth/public.decorator';
 import { Follower } from './entities/follower.entity';
 import { Response } from 'express';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('api/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  toCreate(@Body() createUserDto: User) {
-    return this.userService.create(createUserDto);
+  @Post('register')
+  @Public()
+  async toCreate(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    const fetch = this.userService.register(createUserDto);
+    await fetch.then((a) => {
+      res.header('Authorization', `Bearer ${a?.token}`);
+      res.json({ token: a?.token, user: a?.user });
+    });
   }
 
   @UseGuards(PoliciesGuard)
@@ -35,15 +41,18 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  toFindOne(@Param('id') login: string) {
-    return this.userService.findOneBy(login);
+  @Get('getOne/:uuid')
+  toFindOneUuid(@Param('uuid') uuid: string) {
+    return this.userService.findOneByUuid(uuid);
   }
 
-  @Public()
-  @Get('query/:id')
-  toFindOneForOutput(@Param('id') login: string) {
-    return this.userService.findOneByQuery(login);
+  @Get(':info')
+  toFindOneForOutput(
+    @Param('info') info: string,
+    @UserIntel('email') inUser: string,
+  ) {
+    console.log('UserIntel: ', inUser);
+    return this.userService.findOneWithQuery(info);
   }
 
   @Post('follow')

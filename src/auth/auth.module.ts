@@ -8,9 +8,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { LocalStrategyService } from './local-strategy/local-strategy.service';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategyService } from './jwt-strategy/jwt-strategy.service';
 import { CustomConfiguration } from 'src/custom.Config.Service';
 import { Follower } from 'src/user/entities/follower.entity';
+import { UserGqlModule } from 'src/GraphQl/user-gql/user-gql.module';
+import { GqlLocalStrategyService } from 'src/GraphQl/gql-local-strategy/gql-local-strategy.service';
 // import { Family } from 'src/family/entities/family.entity';
 
 /**
@@ -22,6 +23,7 @@ import { Follower } from 'src/user/entities/follower.entity';
     TypeOrmModule.forFeature([User, Follower]),
     UserModule,
     PassportModule,
+    UserGqlModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -29,7 +31,7 @@ import { Follower } from 'src/user/entities/follower.entity';
     TokenService,
     UserService,
     LocalStrategyService,
-    JwtStrategyService,
+    GqlLocalStrategyService,
     CustomConfiguration,
   ],
   exports: [AuthService],

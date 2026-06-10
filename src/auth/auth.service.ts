@@ -11,13 +11,10 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
-  private tokenBlacklisted = new Set<string>();
-
   constructor(
     private readonly userServ: UserService,
     private readonly tokenServ: TokenService,
   ) {}
-  private salt = process.env.SALT;
 
   async validateUser(login: string, password: string): Promise<User> {
     const user = await this.userServ.findOneInternally(login);
@@ -31,50 +28,15 @@ export class AuthService {
       );
       if (!isValidPassword) {
         throw new BadRequestException('Incorrect Password!');
-        // throw new BadRequestException('Incorrect user input', 'Incorrect Password!');
       } else {
         return user;
       }
     }
   }
 
-  async login(user: SignIn) {
+  login(user: SignIn) {
     const token = this.tokenServ.generateToken(user);
-    const { username } = await this.userServ.findOneInternally(user.login);
-    return { key: token, name: username };
-  }
-
-  logout(token: string) {
-    const payload = this.tokenServ.verifyTokenForTest(token);
-    this.blacklistToken(token.split(' ')[1]);
-    const expiredLog = this.tokenServ.signOut(payload as object);
-    return expiredLog;
-  }
-
-  async register(user: User) {
-    const backUser = await this.userServ.findOneByEmail(user);
-    if (backUser) {
-      const hash_password = await bcrypt.hash(user.password, this.salt!);
-      const new_user: User = { ...user, password: hash_password };
-      const new_user_stored = await this.userServ.create(new_user);
-      const token = this.tokenServ.generateToken({
-        login: new_user_stored.email,
-        password: '',
-      });
-      return token;
-    }
-  }
-
-  verifyBlacklistedToken(token: string) {
-    if (this.tokenBlacklisted.has(token)) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  private blacklistToken(token: string) {
-    this.tokenBlacklisted.add(token);
+    return { token, info: user.login };
   }
 }
 

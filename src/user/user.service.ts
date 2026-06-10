@@ -4,13 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Or, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { ChangePass } from 'src/login.details';
 import { Follower } from './entities/follower.entity';
+import { TokenService } from 'src/token/token.service';
 
 export interface Follow {
   followerId: string;
@@ -24,24 +25,41 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Follower)
     private readonly followerRepository: Repository<Follower>,
+    private readonly tokenServ: TokenService,
   ) {}
 
-  async create({
-    name,
-    username,
-    email,
-    age,
-    password,
-    gender,
-  }: CreateUserDto): Promise<User> {
-    const user: User = new User();
-    user.name = name;
-    user.username = username;
-    user.email = email;
-    user.gender = gender;
-    user.age = age;
-    user.password = password;
-    return await this.userRepository.save(user);
+  async register(createUserDto: CreateUserDto) {
+    const backUser = await this.checkOneForReg(
+      createUserDto.username,
+      createUserDto.email,
+    );
+    if (!backUser) {
+      const hash_password: string = await bcrypt.hash(
+        createUserDto.password,
+        parseInt(this.salt!),
+      );
+      const new_user = {
+        ...createUserDto,
+        password: hash_password,
+      };
+      const new_user_stored = await this.userRepository.save(new_user);
+      const token = this.tokenServ.generateToken({
+        login: new_user_stored.email,
+        password: '',
+      });
+      const user: User = new User();
+      user.name = createUserDto.name;
+      user.username = createUserDto.username;
+      user.email = createUserDto.email;
+      user.gender = createUserDto.gender;
+      user.age = createUserDto.age;
+      user.password = createUserDto.password;
+      const strained_user = {
+        ...new_user_stored,
+        password: undefined,
+      };
+      return { token: token, user: strained_user };
+    }
   }
 
   async findAll(): Promise<User[]> {
@@ -70,19 +88,6 @@ export class UserService {
     return users;
   }
 
-  async findOneBy(login: string): Promise<User> {
-    // Because id: UUID, may throw an error. to avoid this get rid of look up by id
-    const user = await this.userRepository.findOne({
-      // where: [{ username: login }, { email: login }, { id: login }],
-      where: [{ username: login }, { email: login }, { name: login }],
-    });
-
-    if (!user) {
-      throw new NotFoundException('user not found!');
-    }
-    return user;
-  }
-
   async findOneInternally(login: string): Promise<User> {
     const user = await this.userRepository
       .createQueryBuilder('user')
@@ -91,16 +96,39 @@ export class UserService {
       .getOne();
 
     if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+    return user;
+  }
+
+  async findOneByUuid(uuid: string): Promise<User> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :uuid', { uuid: uuid })
+      .select([
+        'user.id',
+        'user.username',
+        'user.name',
+        'user.created_at',
+        'user.updated_at',
+        'user.email',
+        'user.age',
+        'user.gender',
+        'user.isAdmin',
+        'user.canPost',
+      ])
+      .getOne();
+
+    if (!user) {
       throw new NotFoundException('user not found!');
     }
     return user;
   }
 
-  async findOneByQuery(login: string) {
+  async findOneWithQuery(login: string) {
     const user = await this.userRepository
       .createQueryBuilder('user')
-      // .where('user.id = :id', { id: login })
-      .orWhere('user.username = :username', { username: login })
+      .where('user.username = :username', { username: login })
       .orWhere('user.email = :email', { email: login })
       .orWhere('user.name = :name', { name: login })
       .select([
@@ -160,7 +188,7 @@ export class UserService {
     return 'User unfollowed successfully!';
   }
 
-  async findOneByEmail({ username, email }: User): Promise<User> {
+  async checkOneForReg(username: string, email: string): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: [{ email: email }, { username: username }],
     });
@@ -170,9 +198,8 @@ export class UserService {
       } else if (user.username === username) {
         throw new BadRequestException('Username already exists!');
       }
-      return user;
     }
-    throw new NotFoundException('User not found!');
+    return null;
   }
 
   async getFollowers(userId: string, fetch?: number): Promise<User[]> {

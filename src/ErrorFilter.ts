@@ -43,5 +43,3 @@ export class ErrorFilter implements ExceptionFilter {
     });
   }
 }
-// timestamp: new Date().toLocaleString().replace(/([/])/g, '-'),
-// timestamp: new Date().toTimeString().replace('(West Africa Standard Time)', new Date().toDateString()),

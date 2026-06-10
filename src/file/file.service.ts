@@ -35,20 +35,21 @@ export class FileService {
       Bucket: 'My_AWS_bucket_here',
       Key: s3Key,
       Body: file.buffer,
+      // ACL: 'public-read'
     };
 
     await this.s3Client.send(new PutObjectCommand(params));
     const fileEntity = new FileEntity();
     fileEntity.user = createFile.user;
-    fileEntity.fileName = createFile.fileName;
-    fileEntity.type = createFile.type;
+    fileEntity.fileName = createFile.fileName || file.originalname;
+    fileEntity.type = createFile.type || file.mimetype;
     fileEntity.s3Key = s3Key;
     return await this.fileRepo.save(fileEntity);
   }
 
   async download(file: string) {
     const fileExrtd = await this.fileRepo.findOne({
-      where: [{ fileName: file }, { id: file }],
+      where: [{ fileName: file }, { id: file }, { s3Key: file }],
     });
 
     if (fileExrtd) {
@@ -57,9 +58,7 @@ export class FileService {
         Key: fileExrtd.s3Key,
       };
 
-      const data = await this.s3Client.send(new GetObjectCommand(params));
-      // return data.Body;
-      return [data.Body, data.ContentType, file];
+      return await this.s3Client.send(new GetObjectCommand(params));
     } else {
       throw new NotFoundException('File not found!');
     }
