@@ -14,7 +14,6 @@ import { GqlLocalAuthGuardService } from '../gql-local-auth-guard/gql-local-auth
 export class UserGqlService {
   constructor(
     private readonly userServ: UserService,
-    private readonly tokenServ: TokenService,
     private readonly authServ: AuthService,
   ) {}
 
@@ -68,14 +67,8 @@ export class UserGqlService {
     @Args('password') password: string,
     @Context() ctx: { res: Response; req: Request },
   ) {
-    const raw = this.authServ.login({ login, password: '' });
-    // const raw = this.authServ.validateUser(login, password);
-    // const detail = await raw.then((u) => u.email);
-    // const token = this.tokenServ.generateToken({
-    //   login: detail,
-    //   password: password,
-    // });
+    const raw = this.authServ.login({ login, password: password });
     ctx.res.header('Authorization', `Bearer ${raw.token}`);
-    ctx.res.json({ token: raw.token, name: login, message: 'Logged in' });
+    ctx.res.json({ accessToken: raw.token, name: login, message: 'Logged in' });
   }
 }

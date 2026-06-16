@@ -12,6 +12,7 @@ export class GqlLocalAuthGuardService extends AuthGuard('My_Gql') {
       login: string;
       password: string;
     }>();
+
     req.body = { login, password };
     return req;
   }

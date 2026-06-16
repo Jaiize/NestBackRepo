@@ -26,6 +26,7 @@ import { PostReact } from './comment-react/entities/post-react.entity';
 import { UserGqlModule } from './GraphQl/user-gql/user-gql.module';
 import { TokenService } from './token/token.service';
 import { UserService } from './user/user.service';
+import { WhatToWhatService } from './what-to-what/what-to-what.service';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { UserService } from './user/user.service';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    WhatToWhatService,
   ],
   exports: [CustomConfiguration],
 })
