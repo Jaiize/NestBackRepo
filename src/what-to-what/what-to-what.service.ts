@@ -1,17 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import {
   ClassConstructor,
+  ClassTransformOptions,
   plainToClass,
   plainToInstance,
 } from 'class-transformer';
 
 @Injectable()
 export class WhatToWhatService {
-  plainToClass(cls: ClassConstructor<object>, plain: object) {
-    return plainToClass(cls, plain);
+  plainToClass<R, I>(
+    cls: ClassConstructor<R>,
+    plain: I,
+    options?: ClassTransformOptions,
+  ) {
+    return plainToClass(cls, plain, options);
   }
 
-  plainToInstance(cls: ClassConstructor<object>, plain: object) {
-    return plainToInstance(cls, plain);
+  plainToInstance<R, I>(
+    cls: ClassConstructor<R>,
+    plain: I,
+    options?: ClassTransformOptions,
+  ) {
+    return plainToInstance(cls, plain, options);
+  }
+
+  plainArrayToInstance<R, I>(
+    cls: ClassConstructor<R>,
+    plain: I[],
+    options?: ClassTransformOptions,
+  ) {
+    return plainToInstance(cls, plain, options);
   }
 }

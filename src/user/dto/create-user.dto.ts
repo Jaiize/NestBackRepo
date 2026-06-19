@@ -9,15 +9,24 @@ import {
   IsStrongPassword,
   MinLength,
 } from 'class-validator';
+import { Gender } from 'src/GraphQl/user-gql/UserObj';
 
 export class CreateUserDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: 'string',
+    description: "User's name",
+    example: 'John Doe',
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(9, { message: 'Name cannot be less than nine characters!' })
   name!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: 'string',
+    example: 'john_doe',
+    description: "User's username or nickname",
+  })
   @IsNotEmpty()
   @IsString()
   @MinLength(3, { message: 'Username must have atleast three characters!' })
@@ -26,22 +35,25 @@ export class CreateUserDto {
   })
   username!: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'number', description: "User's age" })
   @IsInt()
   age!: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'John@example.com',
+    description: "User's email address",
+    type: 'string',
+  })
   @IsString()
   @IsEmail()
   @IsNotEmpty({ message: "Email field can't be empty" })
   email!: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: "User's gender" })
   @IsNotEmpty()
-  @IsEnum(['m', 'f', 'u'])
-  gender!: string;
+  @IsEnum(Gender)
+  gender!: Gender;
 
-  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @IsStrongPassword(

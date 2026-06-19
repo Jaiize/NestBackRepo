@@ -14,6 +14,7 @@ import { FileEntity } from 'src/file/entities/file.entity';
 import { CommentUser } from 'src/comment/entities/comment.user.entity';
 import { CommentReact } from 'src/comment-react/entities/comment-react.entity';
 import { PostReact } from 'src/comment-react/entities/post-react.entity';
+import { Gender } from 'src/GraphQl/user-gql/UserObj';
 
 @Entity()
 export class User {
@@ -37,9 +38,9 @@ export class User {
   @Column({ type: 'int' })
   age!: number;
 
-  @Column({ type: 'enum', enum: ['m', 'f', 'u'] })
+  @Column({ type: 'enum', enum: Gender })
   @Index()
-  gender!: string;
+  gender!: Gender;
 
   @Column({ type: 'varchar' })
   password!: string;

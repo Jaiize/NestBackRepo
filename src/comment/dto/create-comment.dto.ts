@@ -5,19 +5,19 @@ import { User } from 'src/user/entities/user.entity';
 import { CommentUser } from '../entities/comment.user.entity';
 
 export class CreateCommentDto {
-  @ApiProperty()
+  @ApiProperty({ type: 'string', description: 'Comment content' })
   @IsString()
   @IsNotEmpty()
   content!: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'string', description: 'User info: id' })
   @IsNotEmpty()
   user!: User;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'string', description: 'Room commented on' })
   @IsNotEmpty()
   room!: Room;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'string', description: 'Parent comment' })
   parent!: CommentUser;
 }

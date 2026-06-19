@@ -33,7 +33,7 @@ export class Room {
   amenities!: string;
 
   @Column({ type: 'varchar', nullable: true })
-  photos!: string;
+  photos!: string[];
 
   @OneToMany(() => CommentUser, (commentUser) => commentUser.room)
   comments!: Room[];

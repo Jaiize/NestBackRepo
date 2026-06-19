@@ -83,4 +83,3 @@ import { WhatToWhatService } from './what-to-what/what-to-what.service';
 })
 export class AppModule {}
 
-// C:\Program Files\PostgreSQL\16\scripts>

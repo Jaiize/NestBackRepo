@@ -16,7 +16,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { Readable } from 'stream';
 import { diskStorage } from 'multer';
-// import { UpdateFileDto } from './dto/update-file.dto';
 
 @Controller('api/files')
 export class FileController {
@@ -35,7 +34,9 @@ export class FileController {
   //   }),
   // )
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('image', { limits: { fileSize: 50 * 1024 * 1024 } }),
+  )
   async toUpload(
     @UploadedFile() file: Express.Multer.File,
     @Body() createFileDto: CreateFileDto,
@@ -43,36 +44,22 @@ export class FileController {
     return await this.fileService.upload(file, createFileDto);
   }
 
-  @Get(':id')
-  toDownload(@Param('id') file: string, @Res() res: Response) {
+  @Get(':file')
+  async toDownload(@Param('file') file: string, @Res() res: Response) {
     const result = this.fileService.download(file);
+    const contentType = await result.then((b) => b.ContentType);
     res.set('Content-Disposition', `attachment: filename="${file}"`);
-    res.set('Content-Type', 'application/octet-stream'); // For text file
+    // res.set('Content-Type', 'application/octet-stream'); // For text file
+    res.set('Content-Type', contentType); // For file
     /**
      * Not tested yet!
      */
-    res.json(result)
-    // const stream = (await result).Body as Readable;
-    // Readable.from((await result).Body).pipe(res)
+    const body = await result.then((b) => b.Body);
+    const stream = body as Readable;
+    const chunks: Buffer[] = []
+    for await (const chunk of stream){
+      chunks.push(chunk)
+    }
+    res.json(Buffer.concat(chunks))
   }
-
-  // @Get()
-  // findAll() {
-  //   return this.fileService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.fileService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
-  //   return this.fileService.update(+id, updateFileDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.fileService.remove(+id);
-  // }
 }

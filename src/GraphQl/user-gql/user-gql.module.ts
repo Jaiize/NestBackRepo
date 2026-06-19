@@ -9,6 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { Follower } from 'src/user/entities/follower.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { TokenService } from 'src/token/token.service';
+import { WhatToWhatService } from 'src/what-to-what/what-to-what.service';
 
 @Module({
   imports: [
@@ -32,11 +33,17 @@ import { TokenService } from 'src/token/token.service';
         return {
           message: error.message,
           code: error.extensions?.code,
-          timestamp: time
+          timestamp: time,
         };
       },
     }),
   ],
-  providers: [UserGqlService, UserService, AuthService, TokenService],
+  providers: [
+    UserGqlService,
+    UserService,
+    AuthService,
+    TokenService,
+    WhatToWhatService,
+  ],
 })
 export class UserGqlModule {}

@@ -8,10 +8,14 @@ import { GraphQlErroFilter } from './GraphFilter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
-    .setTitle('NestJS API')
+    .setTitle('NestJS API for Hotel app')
     .setDescription('The API description')
     .setVersion('0.1')
     .addTag('nestjs')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'access-token',
+    )
     .build();
 
   const doc = SwaggerModule.createDocument(app, config);
@@ -21,8 +25,8 @@ async function bootstrap() {
 
   app.enableCors({
     origin: '*',
-    exposedHeaders: ['Authorization']
-  })
+    exposedHeaders: ['Authorization'],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

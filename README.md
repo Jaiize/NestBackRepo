@@ -2,7 +2,9 @@
 REST + GraphQL API for a hotel application built with NestJS
 
 ## Screenshots
-
+![Swagger UI top snap](<Screenshots/Swagger top.png>)
+![Swagger UI Comments](<Screenshots/Swagger token and comment.png>)
+![Swagger UI Schemas](<Screenshots/Swagger shemas.png>)
 
 ## Tech Stack
 **Framework**: NestJs, Node.js, TypeScript

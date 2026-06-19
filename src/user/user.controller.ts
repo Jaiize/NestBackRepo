@@ -15,11 +15,13 @@ import { PoliciesGuard } from 'src/auth/Policies.Guard';
 import { CheckPolicies } from 'src/auth/Policy.check';
 import { PolicyManage } from 'src/auth/casl/casl-manage.factory/Policy.manage';
 import { ChangePass } from 'src/login.details';
-import { Public, UserIntel } from 'src/auth/public.decorator';
+import { Public } from 'src/auth/public.decorator';
 import { Follower } from './entities/follower.entity';
 import { Response } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ApiBearerAuth, ApiProperty } from '@nestjs/swagger';
 
+@ApiBearerAuth('access-token')
 @Controller('api/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -37,21 +39,18 @@ export class UserController {
   @UseGuards(PoliciesGuard)
   @CheckPolicies(new PolicyManage())
   @Get()
-  toFindAll() {
+  toFindAllUsers() {
     return this.userService.findAll();
   }
 
+  @ApiProperty({ example: '4exgd-5f6r3-d8v3', description: 'UUID' })
   @Get('getOne/:uuid')
   toFindOneUuid(@Param('uuid') uuid: string) {
     return this.userService.findOneByUuid(uuid);
   }
 
   @Get(':info')
-  toFindOneForOutput(
-    @Param('info') info: string,
-    @UserIntel('email') inUser: string,
-  ) {
-    console.log('UserIntel: ', inUser);
+  toFindOneForOutput(@Param('info') info: string) {
     return this.userService.findOneWithQuery(info);
   }
 

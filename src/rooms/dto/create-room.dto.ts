@@ -2,48 +2,59 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateRoomDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'The room Number', type: 'string' })
   @IsString()
   @IsNotEmpty()
   roomNumber!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: 'string',
+    description: 'Type of room quality from standard to Luxury',
+    example: 'Deluxe or Suit',
+  })
   @IsNotEmpty()
   roomType!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The Equipments to the room and amenities',
+    type: 'string',
+    example: 'Wi Fi, Bathtub',
+  })
   @IsNotEmpty()
   amenities!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The room Photos: array of string',
+    type: 'array',
+  })
   @IsNotEmpty()
-  photos!: string;
+  photos!: string[];
 
-  @ApiProperty()
+  @ApiProperty({ description: 'The room price', type: 'number' })
   @IsInt()
   @IsNotEmpty()
   price!: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Check-in date', type: 'string' })
   @IsDate()
   @IsNotEmpty()
   checkinTime!: Date;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Check-out date', type: 'string' })
   @IsNotEmpty()
   checkoutTime!: Date;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Room rating', type: 'number' })
   @IsInt()
   @IsNotEmpty()
   rating!: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Date created', type: 'string' })
   @IsString()
   @IsNotEmpty()
   created_at!: Date;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Date updated', type: 'string' })
   @IsNotEmpty()
   updated_at!: Date;
 }

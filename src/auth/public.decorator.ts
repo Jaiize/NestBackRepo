@@ -12,14 +12,15 @@ export const publicDoor = 'isPublic';
 export const Public = () => SetMetadata(publicDoor, true);
 
 export const UserIntel = createParamDecorator(
-  (data: string | undefined, context: ExecutionContext) => {
+  async (data: keyof User | undefined, context: ExecutionContext) => {
     const gqlctx = GqlExecutionContext.create(context);
     const ctxType = context.getType<GqlContextType>();
     const request =
       ctxType === 'graphql'
-        ? (gqlctx.getContext().req as Request)
+        ? gqlctx.getContext<{ req: Request }>().req
         : context.switchToHttp().getRequest<Request>();
 
-    return data ? request.user![data] : (request.user as User);
+    const user = (await request.user) as User;
+    return data ? (user[data] ?? Reflect.get(user, data)) : user;
   },
 );
