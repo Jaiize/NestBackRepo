@@ -49,8 +49,8 @@ export class WebSocketGate
   @SubscribeMessage('users')
   getUsers(@ConnectedSocket() client: Socket) {
     // client.emit('received', { echo: "Users data" })
-    const user = this.userServ.findAll();
-    return { clientId: client.id, echo: user };
+    const users = this.userServ.findAll();
+    return { clientId: client.id, echo: users };
   }
 
   @SubscribeMessage('user')
@@ -61,14 +61,17 @@ export class WebSocketGate
   }
 
   handleConnection(client: Socket) {
-    const rawToken = client.handshake.auth.token as string;
-    const [type, token] = rawToken.split(' ') ?? [];
+    const authToken = client.handshake.auth.token as string;
+    // const queryToken = client.handshake.query.tokem;
+    const [type, token] = authToken.split(' ') ?? [];
     const payload = this.tokenServ.verifyTokenForAuth(
       type === 'Bearer' ? token : '',
     );
     if (payload) {
       client.emit('Welcome', { Message: 'Connected to NestJs application' });
       return { Succces: 'Ok', echo: 'Connected to NestJs application' };
+    } else {
+      client.disconnect();
     }
   }
 

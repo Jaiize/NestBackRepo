@@ -17,18 +17,18 @@ export class WhatToWhatService {
   }
 
   plainToInstance<R, I>(
-    cls: ClassConstructor<R>,
+    inst: ClassConstructor<R>,
     plain: I,
     options?: ClassTransformOptions,
   ) {
-    return plainToInstance(cls, plain, options);
+    return plainToInstance(inst, plain, options);
   }
 
   plainArrayToInstance<R, I>(
-    cls: ClassConstructor<R>,
+    inst: ClassConstructor<R>,
     plain: I[],
     options?: ClassTransformOptions,
   ) {
-    return plainToInstance(cls, plain, options);
+    return plainToInstance(inst, plain, options);
   }
 }

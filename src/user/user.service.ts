@@ -125,6 +125,23 @@ export class UserService {
     return user;
   }
 
+  async findOneForGraph(login: string, sel: string[]) {
+    const filtered = sel.map((f) => f.replace(/\b(?=([a-zA-Z]))/, 'user.'));
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username', { username: login })
+      .orWhere('user.email = :email', { email: login })
+      .orWhere('user.name = :name', { name: login })
+      .select([...filtered])
+      .getOne();
+
+    if (!user) {
+      throw new NotFoundException('user not found!');
+    }
+
+    return user;
+  }
+
   async findOneWithQuery(login: string) {
     const user = await this.userRepository
       .createQueryBuilder('user')

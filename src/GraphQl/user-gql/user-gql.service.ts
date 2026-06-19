@@ -32,20 +32,17 @@ export class UserGqlService {
     return users.map((u) => this.what.plainToInstance(UserObj, u));
   }
 
-  // Get one user by username, email or name
+  // Get user info with properties given from the client! 
   @Query(() => UserObj, { name: 'user' })
-  async getUser(@Args('info') info: string) {
-    const user = await this.userServ.findOneWithQuery(info);
+  async getUser(@Args('cred') cred: string, @Info() inf: GraphQLResolveInfo) {
+    const rawFields = inf.fieldNodes[0].selectionSet?.selections;
+    const fields = rawFields?.map((g: any) => g.name.value as string);
+    const user = await this.userServ.findOneForGraph(cred, fields!);
 
     if (!user) {
       throw new NotFoundException('user not found!');
     }
-
-    return this.what.plainToInstance(UserObj, user, {
-      excludeExtraneousValues: true,
-      enableImplicitConversion: true,
-      exposeDefaultValues: true,
-    });
+    return user
   }
 
   // Register new user

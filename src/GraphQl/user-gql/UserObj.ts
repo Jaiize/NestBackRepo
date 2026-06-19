@@ -65,7 +65,7 @@ export class UserObj {
 
   @ApiProperty({ type: 'number', description: 'Date created' })
   @Field(() => Date)
-  @Expose({ name: 'created_at' })
+  @Expose({ name: 'created_at' }) // name value will be used internally or via transformation e.g => plainToInstance() method
   createdAt!: Date;
 
   @Field(() => Gender)
