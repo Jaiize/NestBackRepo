@@ -3,10 +3,11 @@ import { AppModule } from './app.module';
 import { ErrorFilter } from './ErrorFilter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { GraphQlErroFilter } from './GraphFilter';
+import cookieParser from 'cookie-parser'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser())
   const config = new DocumentBuilder()
     .setTitle('NestJS API for Hotel app')
     .setDescription('The API description')
@@ -14,18 +15,19 @@ async function bootstrap() {
     .addTag('nestjs')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'access-token',
+      'access_token',
     )
     .build();
 
   const doc = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, doc);
 
-  app.useGlobalFilters(new ErrorFilter(), new GraphQlErroFilter());
+  app.useGlobalFilters(new ErrorFilter());
 
   app.enableCors({
     origin: '*',
-    exposedHeaders: ['Authorization'],
+    credentials: true
+    // exposedHeaders: ['Authorization'],
   });
 
   app.useGlobalPipes(

@@ -10,10 +10,7 @@ export class LocalStrategyService extends PassportStrategy(
   Strategy,
   'My_local',
 ) {
-  constructor(
-    private authServ: AuthService,
-    private moduleRef: ModuleRef,
-  ) {
+  constructor(private authServ: AuthService) {
     /**
      * passReqToCallback property is for request-scoped providers which must be true
      */

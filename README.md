@@ -15,10 +15,15 @@ REST + GraphQL API for a hotel application built with NestJS
 ## Features
 - User auth with JWT + refresh tokens
 - User auth with JWT support for GraphQL and WebSocket
-- CRUD endpoints for User, Room, Follow, Comment, Reactions and File entities
+- CRUD endpoints for User, Room, Follower, Comment, Reactions and File entities
+- Follow, unfollow, get followers through dedicated Follower entity
+- Like, dislike, get comment with like and dislike counts, get followers and following users
+- React to post, comment and reply to comments
+- Get replies to comment
 - File Upload to AWS S3
 - Real-time notification via WebSockets
 - Role-based access control
+- ExceptionFilter, GqlExceptionFilter, and WebSocketExceptFilter
 
 
 ## Project setup

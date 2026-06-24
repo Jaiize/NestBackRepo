@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileEntity } from './entities/file.entity';
 import { Repository } from 'typeorm';
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
-import { s3Client } from 'S3Config';
+import { s3Client } from 'src/S3Config';
 import { diskStorage } from 'multer';
 // import { Multer } from 'multer';
 

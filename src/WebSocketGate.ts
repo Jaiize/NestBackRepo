@@ -62,7 +62,7 @@ export class WebSocketGate
 
   handleConnection(client: Socket) {
     const authToken = client.handshake.auth.token as string;
-    // const queryToken = client.handshake.query.tokem;
+    // const queryToken = client.handshake.query.token;
     const [type, token] = authToken.split(' ') ?? [];
     const payload = this.tokenServ.verifyTokenForAuth(
       type === 'Bearer' ? token : '',

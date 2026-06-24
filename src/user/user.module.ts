@@ -8,6 +8,7 @@ import { CaslManageFactory } from 'src/auth/casl/casl-manage.factory/casl-manage
 import { Follower } from './entities/follower.entity';
 import { JwtStrategyService } from 'src/auth/jwt-strategy/jwt-strategy.service';
 import { CustomConfiguration } from 'src/custom.Config.Service';
+import { CookieStrategy } from 'src/token/Cookie.strategy';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Follower])],
@@ -17,6 +18,7 @@ import { CustomConfiguration } from 'src/custom.Config.Service';
     TokenService,
     CaslManageFactory,
     JwtStrategyService,
+    CookieStrategy,
     CustomConfiguration,
   ],
 })

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,6 +26,7 @@ export class UserService {
     @InjectRepository(Follower)
     private readonly followerRepository: Repository<Follower>,
     private readonly tokenServ: TokenService,
+    private readonly data: DataSource,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
@@ -98,6 +99,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
+
     return user;
   }
 

@@ -8,13 +8,17 @@ import { SignIn } from 'src/login.details';
 import { UserService } from 'src/user/user.service';
 import { TokenService } from 'src/token/token.service';
 import * as bcrypt from 'bcryptjs';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userServ: UserService,
     private readonly tokenServ: TokenService,
+    private data: DataSource,
   ) {}
+
+  private salt = process.env.SALT;
 
   async validateUser(login: string, password: string): Promise<User> {
     const user = await this.userServ.findOneInternally(login);
@@ -37,6 +41,23 @@ export class AuthService {
   login(user: SignIn) {
     const token = this.tokenServ.generateToken(user);
     return { token, info: user.login };
+  }
+
+  async cookieLogin(user: SignIn) {
+    const access_token = this.tokenServ.generateCookieToken(user.login);
+    const refresh_token = this.tokenServ.generateRefreshToken(user.login);
+    const hashToken: string = await bcrypt.hash(
+      refresh_token,
+      parseInt(this.salt!),
+    );
+    const fetched_user = await this.userServ.findOneInternally(user.login);
+    fetched_user.refreshToken = hashToken;
+
+    await this.data.transaction(async (manager) => {
+      await manager.save(fetched_user);
+    });
+
+    return { access_token, refresh_token };
   }
 }
 

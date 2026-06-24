@@ -7,7 +7,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  Index
+  Index,
 } from 'typeorm';
 import { Follower } from './follower.entity';
 import { FileEntity } from 'src/file/entities/file.entity';
@@ -84,6 +84,9 @@ export class User {
   @Column({ type: 'boolean', default: false })
   @Index()
   canPost!: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  refreshToken!: string;
 }
 
 //  @VirtualColumn({

@@ -9,16 +9,24 @@ export class TokenService {
   generateToken(user: SignIn) {
     const payload = { user: user.login };
     return this.jwtServ.sign(payload, {
-      issuer: 'Jaize',
       algorithm: 'HS384',
     });
   }
 
-  generateRefreshToken(token: string) {
-    const user = this.verifyToken(token);
-    const payload = { user: user };
+  generateCookieToken(email: string) {
+    const payload = { user: email };
+    return this.jwtServ.sign(payload, {
+      algorithm: 'HS384',
+      expiresIn: '1 Hr',
+    });
+  }
+
+  generateRefreshToken(email: string) {
+    const payload = { user: email };
     return this.jwtServ.sign(payload, {
       algorithm: 'HS512',
+      secret: process.env.REF_SECRET_KEY,
+      expiresIn: '7 Days',
     });
   }
 
@@ -47,7 +55,6 @@ export class TokenService {
       throw new UnauthorizedException();
     }
   }
-
 }
 
 // JwtPayload properties

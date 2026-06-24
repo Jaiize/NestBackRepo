@@ -21,7 +21,7 @@ import { Response } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiBearerAuth, ApiProperty } from '@nestjs/swagger';
 
-@ApiBearerAuth('access-token')
+@ApiBearerAuth('access_token')
 @Controller('api/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
