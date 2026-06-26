@@ -10,6 +10,7 @@ import { Follower } from 'src/user/entities/follower.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { TokenService } from 'src/token/token.service';
 import { WhatToWhatService } from 'src/what-to-what/what-to-what.service';
+import { CustomConfiguration } from 'src/custom.Config.Service';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { WhatToWhatService } from 'src/what-to-what/what-to-what.service';
     AuthService,
     TokenService,
     WhatToWhatService,
+    CustomConfiguration
   ],
 })
 export class UserGqlModule {}

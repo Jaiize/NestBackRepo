@@ -7,10 +7,11 @@ import { UserService } from 'src/user/user.service';
 import { TokenService } from 'src/token/token.service';
 import { User } from 'src/user/entities/user.entity';
 import { Follower } from 'src/user/entities/follower.entity';
+import { CustomConfiguration } from 'src/custom.Config.Service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Family, User, Follower])],
   controllers: [FamilyController],
-  providers: [FamilyService, TokenService, UserService],
+  providers: [FamilyService, TokenService, UserService, CustomConfiguration],
 })
 export class FamilyModule {}

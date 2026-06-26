@@ -1,10 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignIn } from 'src/login.details';
 import { JwtService } from '@nestjs/jwt';
+import { CustomConfiguration } from 'src/custom.Config.Service';
 
 @Injectable()
 export class TokenService {
-  constructor(private readonly jwtServ: JwtService) {}
+  constructor(
+    private readonly jwtServ: JwtService,
+    private configServ: CustomConfiguration,
+  ) {}
 
   generateToken(user: SignIn) {
     const payload = { user: user.login };
@@ -25,24 +29,11 @@ export class TokenService {
     const payload = { user: email };
     return this.jwtServ.sign(payload, {
       algorithm: 'HS512',
-      secret: process.env.REF_SECRET_KEY,
+      secret: this.configServ.refSecretKey,
       expiresIn: '7 Days',
     });
   }
 
-  verifyToken(token: string) {
-    try {
-      const tokenTaken = token.split(' ')[1];
-      const payload = this.jwtServ.verify<object>(tokenTaken);
-      if (payload !== null) {
-        const { user } = payload as { user: string; iat: number; iss: string };
-        return user;
-      }
-    } catch (e) {
-      console.error(e);
-      throw new UnauthorizedException();
-    }
-  }
 
   verifyTokenForAuth(token: string) {
     try {

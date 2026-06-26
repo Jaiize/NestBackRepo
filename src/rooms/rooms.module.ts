@@ -6,10 +6,17 @@ import { Room } from './entities/room.entity';
 import { TokenService } from 'src/token/token.service';
 import { CaslManageFactory } from 'src/auth/casl/casl-manage.factory/casl-manage.factory';
 import { PolicyUpdate } from 'src/auth/casl/casl-manage.factory/Policy.upate';
+import { CustomConfiguration } from 'src/custom.Config.Service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Room])],
   controllers: [RoomsController],
-  providers: [PolicyUpdate, RoomsService, TokenService, CaslManageFactory],
+  providers: [
+    PolicyUpdate,
+    RoomsService,
+    TokenService,
+    CaslManageFactory,
+    CustomConfiguration,
+  ],
 })
 export class RoomsModule {}

@@ -10,7 +10,7 @@ import { Request } from 'express';
 export class JwtStrategyService extends PassportStrategy(Strategy, 'My_jwt') {
   constructor(
     private userServ: UserService,
-    private configService: CustomConfiguration,
+    private configServ: CustomConfiguration,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -20,7 +20,7 @@ export class JwtStrategyService extends PassportStrategy(Strategy, 'My_jwt') {
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.secretKey,
+      secretOrKey: configServ.secretKey!,
     });
   }
 

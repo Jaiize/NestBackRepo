@@ -12,6 +12,7 @@ import * as bcrypt from 'bcryptjs';
 import { ChangePass } from 'src/login.details';
 import { Follower } from './entities/follower.entity';
 import { TokenService } from 'src/token/token.service';
+import { CustomConfiguration } from 'src/custom.Config.Service';
 
 export interface Follow {
   followerId: string;
@@ -20,13 +21,10 @@ export interface Follow {
 
 @Injectable()
 export class UserService {
-  private salt = process.env.SALT;
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(Follower)
-    private readonly followerRepository: Repository<Follower>,
     private readonly tokenServ: TokenService,
-    private readonly data: DataSource,
+    private configServ: CustomConfiguration,
+    private data: DataSource,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
@@ -37,13 +35,13 @@ export class UserService {
     if (!backUser) {
       const hash_password: string = await bcrypt.hash(
         createUserDto.password,
-        parseInt(this.salt!),
+        this.configServ.salt!,
       );
       const new_user = {
         ...createUserDto,
         password: hash_password,
       };
-      const new_user_stored = await this.userRepository.save(new_user);
+      const new_user_stored = await this.data.manager.save(User, new_user);
       const token = this.tokenServ.generateToken({
         login: new_user_stored.email,
         password: '',
@@ -64,7 +62,7 @@ export class UserService {
   }
 
   async findAll(): Promise<User[]> {
-    const users = await this.userRepository.find({
+    const users = await this.data.manager.find(User, {
       select: [
         'age',
         'canPost',
@@ -90,8 +88,8 @@ export class UserService {
   }
 
   async findOneInternally(login: string): Promise<User> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
+    const user = await this.data.manager
+      .createQueryBuilder(User, 'user')
       .where('user.username = :username', { username: login })
       .orWhere('user.email = :email', { email: login })
       .getOne();
@@ -104,8 +102,8 @@ export class UserService {
   }
 
   async findOneByUuid(uuid: string): Promise<User> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
+    const user = await this.data.manager
+      .createQueryBuilder(User, 'user')
       .where('user.id = :uuid', { uuid: uuid })
       .select([
         'user.id',
@@ -129,8 +127,8 @@ export class UserService {
 
   async findOneForGraph(login: string, sel: string[]) {
     const filtered = sel.map((f) => f.replace(/\b(?=([a-zA-Z]))/, 'user.'));
-    const user = await this.userRepository
-      .createQueryBuilder('user')
+    const user = await this.data.manager
+      .createQueryBuilder(User, 'user')
       .where('user.username = :username', { username: login })
       .orWhere('user.email = :email', { email: login })
       .orWhere('user.name = :name', { name: login })
@@ -145,8 +143,8 @@ export class UserService {
   }
 
   async findOneWithQuery(login: string) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
+    const user = await this.data.manager
+      .createQueryBuilder(User, 'user')
       .where('user.username = :username', { username: login })
       .orWhere('user.email = :email', { email: login })
       .orWhere('user.name = :name', { name: login })
@@ -179,7 +177,7 @@ export class UserService {
       throw new BadRequestException('You cannot follow yourself!');
     }
 
-    const exists = await this.followerRepository.findOne({
+    const exists = await this.data.manager.findOne(Follower, {
       where: { followerId, followingId },
     });
 
@@ -187,16 +185,16 @@ export class UserService {
       throw new BadRequestException('Already following!');
     }
 
-    const result = this.followerRepository.create({
+    const result = this.data.manager.create(Follower, {
       followerId,
       followingId,
     });
 
-    return await this.followerRepository.save(result);
+    return await this.data.manager.save(Follower, result);
   }
 
   async unFollowUser({ followerId, followingId }: Follow): Promise<string> {
-    const isDeleted = await this.followerRepository.delete({
+    const isDeleted = await this.data.manager.delete(Follower, {
       followerId,
       followingId,
     });
@@ -208,7 +206,7 @@ export class UserService {
   }
 
   async checkOneForReg(username: string, email: string): Promise<User | null> {
-    const user = await this.userRepository.findOne({
+    const user = await this.data.manager.findOne(User, {
       where: [{ email: email }, { username: username }],
     });
     if (user) {
@@ -222,20 +220,28 @@ export class UserService {
   }
 
   async getFollowers(userId: string, fetch?: number): Promise<User[]> {
-    const user = await this.followerRepository.find({
+    const user = await this.data.manager.find(Follower, {
       where: { followingId: userId },
       relations: ['followerUser'],
       take: fetch,
     });
-    return user.map((e) => e.followerUser);
+    if (user.length === 0) {
+      throw new NotFoundException("You don't have any followers yet!");
+    }
+    return user.map((e) => ({ ...e.followerUser, password: '' }));
   }
 
   async getFollowing(userId: string, fetch?: number): Promise<User[]> {
-    const user = await this.followerRepository.find({
+    const user = await this.data.manager.find(Follower, {
       where: { followerId: userId },
       relations: ['followingUser'],
       take: fetch,
     });
+
+    if (user.length === 0) {
+      throw new NotFoundException("You're not following anyone yet!");
+    }
+
     return user.map((e) => e.followingUser);
   }
 
@@ -246,7 +252,7 @@ export class UserService {
     email,
     username,
   }: UpdateUserDto): Promise<undefined | string> {
-    const exists = await this.userRepository.findOne({
+    const exists = await this.data.manager.findOne(User, {
       where: { email: email },
     });
     if (exists) {
@@ -255,7 +261,7 @@ export class UserService {
       exists.gender = gender!;
       exists.username = username!;
 
-      await this.userRepository.save(exists);
+      await this.data.manager.save(User, exists);
       return 'Successfully Updated!';
     } else {
       return undefined;
@@ -270,26 +276,29 @@ export class UserService {
     email,
     password,
   }: ChangePass): Promise<string | undefined> {
-    const user = await this.userRepository.findOne({
+    const user = await this.data.manager.findOne(User, {
       where: {
         email: email,
       },
     });
     if (user) {
-      const new_pass: string = await bcrypt.hash(password, this.salt!);
+      const new_pass: string = await bcrypt.hash(
+        password,
+        this.configServ.salt!,
+      );
       user.password = new_pass;
-      await this.userRepository.save(user);
+      await this.data.manager.save(User, user);
       return 'Successfully changed!';
     }
     throw new NotFoundException('user not found!');
   }
 
   async remove(email: string): Promise<User | undefined> {
-    const exists = await this.userRepository.findOne({
+    const exists = await this.data.manager.findOne(User, {
       where: { email: email },
     });
     if (exists) {
-      return this.userRepository.remove(exists);
+      return this.data.manager.remove(User, exists);
     }
   }
 }

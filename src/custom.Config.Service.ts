@@ -1,22 +1,51 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ConfigEnv } from './config/config.config';
 
 @Injectable()
 export class CustomConfiguration {
-  private secret!: string;
-  private Refsecret!: string;
+  constructor(private configService: ConfigService) {}
 
-  constructor(private configService: ConfigService) {
-    this.secret = this.configService.get('SECRET_KEY') as string;
-    this.Refsecret = this.configService.get('REF_SECRET_KEY') as string;
+  get secretKey() {
+    return this.configService.get<ConfigEnv['secret']>('secret');
   }
 
-  get secretKey(): string {
-    return this.secret;
+  get refSecretKey() {
+    return this.configService.get<ConfigEnv['refsecret']>('refsecret');
   }
 
-  get refSecretKey(): string {
-    return this.Refsecret;
+  get dataName() {
+    return this.configService.get<ConfigEnv['database']['name']>(
+      'database.name',
+    );
+  }
+
+  get dataPort() {
+    return this.configService.get<ConfigEnv['database']['port']>(
+      'database.port',
+    );
+  }
+
+  get dataUser() {
+    return this.configService.get<ConfigEnv['database']['username']>(
+      'database.username',
+    );
+  }
+
+  get dataPass() {
+    return this.configService.get<ConfigEnv['database']['password']>(
+      'database.password',
+    );
+  }
+
+  get dataHost() {
+    return this.configService.get<ConfigEnv['database']['host']>(
+      'database.host',
+    );
+  }
+
+  get salt() {
+    return this.configService.get<ConfigEnv['salt']>('salt');
   }
 
   get allEnv() {

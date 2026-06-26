@@ -14,7 +14,7 @@ import * as bcrypt from 'bcryptjs';
 import { Public } from 'src/auth/public.decorator';
 import { CookieGuard } from './Cookie.guard';
 import { DataSource } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
+import { CustomConfiguration } from 'src/custom.Config.Service';
 
 @Controller('api/refresh')
 export class TokenController {
@@ -22,6 +22,7 @@ export class TokenController {
   constructor(
     private readonly tokenServ: TokenService,
     private readonly userServ: UserService,
+    private config: CustomConfiguration,
     private data: DataSource,
   ) {}
 
@@ -56,7 +57,7 @@ export class TokenController {
 
     const hash_token: string = await bcrypt.hash(
       refresh_token,
-      parseInt(this.salt!),
+      this.config.salt!,
     );
 
     user.refreshToken = hash_token;

@@ -34,7 +34,6 @@ export class JwtAuthGuard extends AuthGuard('My_jwt') implements CanActivate {
       const payload = this.tradeTokenForPayload(context) as {
         user: string;
         iat: number;
-        iss: string;
       };
       const user = this.getUserForGql(payload.user);
       const gqlCtx = GqlExecutionContext.create(context);
