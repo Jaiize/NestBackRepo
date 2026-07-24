@@ -6,7 +6,7 @@ import { UserService } from 'src/user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Follower } from 'src/user/entities/follower.entity';
-import { CustomConfiguration } from 'src/custom.Config.Service';
+import { CustomConfiguration } from 'src/custom-config/custom.Config.Service';
 import { CustomConfigModule } from 'src/custom-config/custom-config.module';
 
 @Module({

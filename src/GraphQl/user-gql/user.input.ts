@@ -48,7 +48,7 @@ export class UserInput {
     },
     {
       message:
-        'Password too weak. Password should be minimum of 8 Characters, one digit, two lowerCase, one upperCase',
+        'Password too weak. Password should be minimum of 8 Characters, one digit, two lowercase, one uppercase',
     },
   )
   password!: string;

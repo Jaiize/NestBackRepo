@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ConfigEnv } from './config/config.config';
+import { ConfigEnv } from '../config/config.config';
 
 @Injectable()
 export class CustomConfiguration {

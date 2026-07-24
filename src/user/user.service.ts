@@ -12,7 +12,7 @@ import * as bcrypt from 'bcryptjs';
 import { ChangePass } from 'src/login.details';
 import { Follower } from './entities/follower.entity';
 import { TokenService } from 'src/token/token.service';
-import { CustomConfiguration } from 'src/custom.Config.Service';
+import { CustomConfiguration } from 'src/custom-config/custom.Config.Service';
 
 export interface Follow {
   followerId: string;
@@ -173,17 +173,14 @@ export class UserService {
   }
 
   async followUser({ followerId, followingId }: Follow): Promise<Follower> {
-    if (followerId === followingId) {
+    if (followerId === followingId)
       throw new BadRequestException('You cannot follow yourself!');
-    }
 
     const exists = await this.data.manager.findOne(Follower, {
       where: { followerId, followingId },
     });
 
-    if (exists) {
-      throw new BadRequestException('Already following!');
-    }
+    if (exists) throw new BadRequestException('Already following!');
 
     const result = this.data.manager.create(Follower, {
       followerId,
@@ -219,11 +216,17 @@ export class UserService {
     return null;
   }
 
-  async getFollowers(userId: string, fetch?: number): Promise<User[]> {
+  async getFollowers(
+    userId: string,
+    fetch?: number,
+    page?: number,
+  ): Promise<User[]> {
+    const page_num = page! - 1;
+    const offset = page_num * fetch!;
+
     const user = await this.data.manager.find(Follower, {
       where: { followingId: userId },
       relations: ['followerUser'],
-      take: fetch,
     });
     if (user.length === 0) {
       throw new NotFoundException("You don't have any followers yet!");
@@ -231,18 +234,24 @@ export class UserService {
     return user.map((e) => ({ ...e.followerUser, password: '' }));
   }
 
-  async getFollowing(userId: string, fetch?: number): Promise<User[]> {
+  async getFollowing(
+    userId: string,
+    fetch?: number,
+    page?: number,
+  ): Promise<User[]> {
+    const page_num = page! - 1;
+    const offset = page_num * fetch!;
+
     const user = await this.data.manager.find(Follower, {
       where: { followerId: userId },
       relations: ['followingUser'],
-      take: fetch,
     });
 
     if (user.length === 0) {
       throw new NotFoundException("You're not following anyone yet!");
     }
 
-    return user.map((e) => e.followingUser);
+    return user.map((e) => ({ ...e.followingUser, password: '' }));
   }
 
   async update({
@@ -303,13 +312,6 @@ export class UserService {
   }
 }
 
-// const user = this.userRepository
-//   .createQueryBuilder('user')
-//   .leftJoinAndSelect('user.followers', 'followers')
-//   .leftJoinAndSelect('user.following', 'following')
-//   .where('user.username = :username', { username: login })
-//   .execute();
-// Weird keys though
 
 // Correct query display with relation joined
 // const user = await this.userRepository

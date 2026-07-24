@@ -31,7 +31,7 @@ export class JwtAuthGuard extends AuthGuard('My_jwt') implements CanActivate {
       return true;
     }
     if (context.getType<GqlContextType>() === 'graphql') {
-      const payload = this.tradeTokenForPayload(context) as {
+      const payload = this.putContextForPayload(context) as {
         user: string;
         iat: number;
       };
@@ -47,7 +47,7 @@ export class JwtAuthGuard extends AuthGuard('My_jwt') implements CanActivate {
     return super.canActivate(context);
   }
 
-  private tradeTokenForPayload(ctx: ExecutionContext) {
+  private putContextForPayload(ctx: ExecutionContext) {
     const request = GqlExecutionContext.create(ctx).getContext<{
       req: Request;
     }>().req;

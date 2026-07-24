@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignIn } from 'src/login.details';
 import { JwtService } from '@nestjs/jwt';
-import { CustomConfiguration } from 'src/custom.Config.Service';
+import { CustomConfiguration } from 'src/custom-config/custom.Config.Service';
 
 @Injectable()
 export class TokenService {

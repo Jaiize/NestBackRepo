@@ -16,6 +16,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { GqlLocalAuthGuardService } from '../gql-local-auth-guard/gql-local-auth-guard.service';
 import { WhatToWhatService } from 'src/what-to-what/what-to-what.service';
 import { GraphQLResolveInfo } from 'graphql';
+import { Long } from 'typeorm';
 
 @Resolver(() => UserObj)
 export class UserGqlService {
@@ -32,7 +33,7 @@ export class UserGqlService {
     return users.map((u) => this.what.plainToInstance(UserObj, u));
   }
 
-  // Get user info with properties given from the client! 
+  // Get user info with properties given from the client side!
   @Query(() => UserObj, { name: 'user' })
   async getUser(@Args('cred') cred: string, @Info() inf: GraphQLResolveInfo) {
     const rawFields = inf.fieldNodes[0].selectionSet?.selections;
@@ -42,7 +43,7 @@ export class UserGqlService {
     if (!user) {
       throw new NotFoundException('user not found!');
     }
-    return user
+    return user;
   }
 
   // Register new user
@@ -68,8 +69,8 @@ export class UserGqlService {
     @Args('password') password: string,
     @Context() ctx: { res: Response; req: Request },
   ) {
-    const raw = this.authServ.login({ login, password: password });
+    const raw = this.authServ.login({ login, password });
     ctx.res.header('Authorization', `Bearer ${raw.token}`);
-    ctx.res.json({ accessToken: raw.token, name: login, message: 'Logged in' });
+    return { name: login, accessToken: raw.token };
   }
 }
