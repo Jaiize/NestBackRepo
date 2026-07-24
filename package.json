@@ -1,8 +1,8 @@
 {
-  "name": "backend-post",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "name": "Hotel-Backend-App",
+  "version": "0.10.20",
+  "description": "A large hotel app that supports following, follow back, make and reply to comments, react to posts (rooms), react to comments",
+  "author": "Tosin Emmanuel",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

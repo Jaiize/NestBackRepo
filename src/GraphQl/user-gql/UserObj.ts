@@ -24,7 +24,7 @@ export class UserObj {
 
   @ApiProperty({
     example: 'John Doe',
-    description: 'The user full name',
+    description: "The user's full name",
     type: 'string',
   })
   @Field()
@@ -33,7 +33,7 @@ export class UserObj {
 
   @ApiProperty({
     example: 'JohnDoe@example.com',
-    description: 'The user email',
+    description: "The user's email",
     type: 'string',
   })
   @Field()
@@ -65,9 +65,13 @@ export class UserObj {
 
   @ApiProperty({ type: 'number', description: 'Date created' })
   @Field(() => Date)
-  @Expose({ name: 'created_at' }) // name value will be used internally or via transformation e.g => plainToInstance() method
+  @Expose({ name: 'created_at' }) // Name value will be used internally or via transformation e.g => plainToInstance() method
   createdAt!: Date;
 
   @Field(() => Gender)
   gender!: Gender;
+
+  @Field()
+  @Expose()
+  accessToken!: string
 }

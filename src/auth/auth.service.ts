@@ -9,7 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { TokenService } from 'src/token/token.service';
 import * as bcrypt from 'bcryptjs';
 import { DataSource } from 'typeorm';
-import { CustomConfiguration } from 'src/custom.Config.Service';
+import { CustomConfiguration } from 'src/custom-config/custom.Config.Service';
 
 @Injectable()
 export class AuthService {

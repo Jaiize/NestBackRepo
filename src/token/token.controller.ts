@@ -14,7 +14,7 @@ import * as bcrypt from 'bcryptjs';
 import { Public } from 'src/auth/public.decorator';
 import { CookieGuard } from './Cookie.guard';
 import { DataSource } from 'typeorm';
-import { CustomConfiguration } from 'src/custom.Config.Service';
+import { CustomConfiguration } from 'src/custom-config/custom.Config.Service';
 
 @Controller('api/refresh')
 export class TokenController {
@@ -72,12 +72,13 @@ export class TokenController {
       sameSite: 'lax',
       maxAge: 1e3 * 60 * 60,
     });
+
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
       maxAge: 1e3 * 60 * 60 * 24 * 7,
-      // expires: new Date(Date.now() + 1e3 * 60 * 60 * 24 * 7), // A 7day expiration
+      // expires: new Date(Date.now() + 1e3 * 60 * 60 * 24 * 7), // A 7-day expiration
       path: '/api/refresh/token',
     });
     return { success: true };
