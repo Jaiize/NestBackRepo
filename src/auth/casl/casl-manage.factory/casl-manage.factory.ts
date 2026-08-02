@@ -39,7 +39,7 @@ export class CaslManageFactory {
   }
 }
 
-// One of the complex syntaxes
+
 /*
 (alias) type InferSubjects<T, IncludeTagName extends boolean = false> = T | 
   (T extends AnyClass<infer I> ? I | 

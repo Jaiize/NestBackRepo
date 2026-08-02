@@ -1,6 +1,6 @@
 {
   "name": "Hotel-Backend-App",
-  "version": "0.10.20",
+  "version": "0.10.21",
   "description": "A large hotel app that supports following, follow back, make and reply to comments, react to posts (rooms), react to comments",
   "author": "Tosin Emmanuel",
   "private": true,
@@ -10,6 +10,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "app": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

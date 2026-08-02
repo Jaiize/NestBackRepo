@@ -1,12 +1,16 @@
 import { PostReact } from 'src/comment-react/entities/post-react.entity';
 import { CommentUser } from 'src/comment/entities/comment.user.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -17,6 +21,7 @@ export enum Status {
   REAPPRAISAL = 'reappraisal',
 }
 
+@Unique(['id', 'userId'])
 @Entity()
 export class Room {
   @PrimaryGeneratedColumn()
@@ -40,6 +45,14 @@ export class Room {
 
   @OneToMany(() => PostReact, (postReact) => postReact.room)
   postReact!: PostReact[];
+
+  @ManyToOne(() => User, (user) => user.rooms, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'room_author' })
+  user!: User;
+
+  @Column({ name: 'room_author', type: 'varchar' })
+  @Index()
+  userId!: string;
 
   @Column({ type: 'int' })
   @Index()

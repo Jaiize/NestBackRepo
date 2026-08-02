@@ -15,8 +15,8 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return "Hotel-inventory Backend App!"', () => {
+      expect(appController.toGetMessage()).toBe('Hotel-inventory Backend App!');
     });
   });
 });

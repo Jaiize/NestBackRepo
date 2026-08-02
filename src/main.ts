@@ -3,15 +3,22 @@ import { AppModule } from './app.module';
 import { ErrorFilter } from './ErrorFilter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(cookieParser())
+
+  app.useWebSocketAdapter(new IoAdapter(app));
+  app.enableCors();
+
+  app.use(cookieParser());
   const config = new DocumentBuilder()
-    .setTitle('NestJS API for Hotel app')
-    .setDescription('The API description')
-    .setVersion('0.1')
+    .setTitle('NestJS API for Hotel-inventory app')
+    .setDescription(
+      'A large hotel app that supports following, follow back, make and reply to comments, react to posts (rooms), react to comments',
+    )
+    .setVersion('0.10.21')
     .addTag('nestjs')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },

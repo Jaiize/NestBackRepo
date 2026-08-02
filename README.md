@@ -22,6 +22,7 @@ REST + GraphQL API for a hotel application built with NestJS
 - Get replies to comment
 - File Upload to AWS S3
 - Real-time notification via WebSockets
+- Chat rooms and DM via WebSockets (Socket.IO)
 - Role-based access control
 - ExceptionFilter, GqlExceptionFilter, and WebSocketExceptFilter
 

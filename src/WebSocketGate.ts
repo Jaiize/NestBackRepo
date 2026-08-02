@@ -7,6 +7,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from './user/user.service';
@@ -14,11 +15,22 @@ import { TokenService } from './token/token.service';
 import { UseFilters } from '@nestjs/common';
 import { WebSocketExceptFilter } from './WebSocketExceptFilter';
 
-@UseFilters(WebSocketExceptFilter) // Still in progress
+export interface WsUser {
+  id: string;
+  email: string;
+  username: string;
+  canPost: boolean;
+  isAdmin: boolean;
+}
+
+@UseFilters(new WebSocketExceptFilter()) // Still in progress
 @WebSocketGateway({
+  // namespace: '/chat',
   cors: {
     origin: '*',
+    credentials: true,
   },
+  transports: ['websocket', 'polling'],
 })
 export class WebSocketGate implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server!: Server;
@@ -27,6 +39,48 @@ export class WebSocketGate implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly userServ: UserService,
     private tokenServ: TokenService,
   ) {}
+
+  async handleConnection(client: Socket) {
+    try {
+      const authToken =
+        (client.handshake.auth.token as string) ||
+        (client.handshake.query.token as string) ||
+        (client.handshake.headers?.authorization as string);
+
+      const [type, token] = authToken.split(' ') ?? [];
+      const payload = this.tokenServ.verifyTokenForAuth(
+        type === 'Bearer' ? token : '',
+      ) as { user: string; iat: number };
+
+      if (payload) {
+        const user = await this.userServ.findOneInternally(payload.user);
+
+        client.data = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          canPost: user.canPost,
+          isAdmin: user.isAdmin,
+        };
+
+        client.emit('welcome', {
+          Message: 'Connected to NestJs application',
+          user: (client.data as WsUser).username,
+        });
+        return {
+          echo: 'Connected to NestJs application',
+          user: (client.data as WsUser).username,
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      client.disconnect();
+    }
+  }
+
+  handleDisconnect(client: Socket) {
+    client.disconnect();
+  }
 
   /*afterInit(server: any) {
     setInterval(() => {
@@ -49,48 +103,36 @@ export class WebSocketGate implements OnGatewayConnection, OnGatewayDisconnect {
   }*/
 
   @SubscribeMessage('users')
-  getUsers(@ConnectedSocket() client: Socket) {
-    const users = this.userServ.findAll();
-    // client.emit('received', { echo: "Users data" })
+  async getUsers(@ConnectedSocket() client: Socket) {
+    if (!(client.data as WsUser).isAdmin) {
+      client.emit('fetch_error', {
+        message: "You don't have access to this event!",
+      });
+      // throw new WsException("You don't have access to this event!")
+      return {
+        clientId: client.id,
+        message: "You don't have access to this event!",
+      };
+    }
+    const users = await this.userServ.findAll();
+
+    client.emit('receive_all', { echo: users });
     return { clientId: client.id, echo: users };
   }
 
   @SubscribeMessage('user')
-  getUser(@MessageBody() login: string, @ConnectedSocket() client: Socket) {
-    const user = this.userServ.findOneWithQuery(login);
-    // client.emit('received', { result: user })
-    return { clientId: client.id, echo: user };
-  }
-
-  async handleConnection(client: Socket) {
-    try {
-      const authToken = client.handshake.auth.token as string;
-      // const queryToken = client.handshake.query.token;
-      const [type, token] = authToken.split(' ') ?? [];
-      const payload = this.tokenServ.verifyTokenForAuth(
-        type === 'Bearer' ? token : '',
-      ) as { user: string; iat: number };
-      if (payload) {
-        const user = await this.userServ.findOneInternally(payload.user);
-        client.data = {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          canPost: user.canPost,
-          isAdmin: user.isAdmin,
-        };
-        client.emit('Welcome', { Message: 'Connected to NestJs application' });
-        return { Succces: 'Ok', echo: 'Connected to NestJs application' };
-      }
-    } catch (error) {
-      console.log(error);
-      client.disconnect();
+  async getUser(
+    @MessageBody() { login }: { login: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = await this.userServ.findOneWithQuery(login);
+    if (!user) {
+      client.emit('not_found', { message: 'user not found' });
+      return { message: 'user not found' };
     }
-  }
-
-  handleDisconnect(client: Socket) {
-    client.disconnect();
+    client.emit('receive', { result: user });
+    return { clientId: client.id, echo: user };
   }
 }
 
-// Download @types for websockets
+// Download @types for websockets npm i @socket.io/redis-platform npm i redis

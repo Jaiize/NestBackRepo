@@ -23,18 +23,8 @@ import { CustomConfiguration } from 'src/custom-config/custom.Config.Service';
         return { req, res };
       },
       formatError: (error) => {
-        const time = new Date().toLocaleString('en-US', {
-          weekday: 'short',
-          day: '2-digit',
-          month: 'short',
-          hour: '2-digit',
-          minute: 'numeric',
-        });
-
         return {
           message: error.message,
-          code: error.extensions?.code,
-          timestamp: time,
         };
       },
     }),
@@ -45,7 +35,7 @@ import { CustomConfiguration } from 'src/custom-config/custom.Config.Service';
     AuthService,
     TokenService,
     WhatToWhatService,
-    CustomConfiguration
+    CustomConfiguration,
   ],
 })
 export class UserGqlModule {}

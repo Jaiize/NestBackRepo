@@ -15,6 +15,7 @@ import { CommentUser } from 'src/comment/entities/comment.user.entity';
 import { CommentReact } from 'src/comment-react/entities/comment-react.entity';
 import { PostReact } from 'src/comment-react/entities/post-react.entity';
 import { Gender } from 'src/GraphQl/user-gql/UserObj';
+import { Room } from 'src/rooms/entities/room.entity';
 
 @Entity()
 export class User {
@@ -66,6 +67,9 @@ export class User {
 
   @OneToMany(() => CommentReact, (commentReact) => commentReact.user)
   commentlikes!: CommentReact[];
+
+  @OneToMany(() => Room, (room) => room.user, { cascade: true })
+  rooms!: Room[];
 
   @OneToMany(() => PostReact, (postReact) => postReact.user)
   postlikes!: PostReact[];

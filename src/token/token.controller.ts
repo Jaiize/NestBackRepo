@@ -15,6 +15,7 @@ import { Public } from 'src/auth/public.decorator';
 import { CookieGuard } from './Cookie.guard';
 import { DataSource } from 'typeorm';
 import { CustomConfiguration } from 'src/custom-config/custom.Config.Service';
+import { User } from 'src/user/entities/user.entity';
 
 @Controller('api/refresh')
 export class TokenController {
@@ -31,14 +32,14 @@ export class TokenController {
   @Post('token')
   async toRefresh(
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response, // passthrough for when res.json() or res.send() is not used, even return would be ignored
+    @Res({ passthrough: true }) res: Response, // passthrough for when res.json() or res.send() is not used, even return will be ignored
   ) {
     const refreshToken = req.cookies.refresh_token as string;
 
     if (!refreshToken) throw new UnauthorizedException();
 
     const { email } = req.user as {
-      userId: string;
+      id: string;
       email: string;
       username: string;
     };
@@ -50,7 +51,10 @@ export class TokenController {
       user.refreshToken,
     );
 
-    if (!isValid) throw new BadRequestException('Expired token!');
+    if (!isValid)
+      throw new BadRequestException(
+        'Expired token, please navigate to the login endpoint!',
+      );
 
     const access_token = this.tokenServ.generateCookieToken(user.email);
     const refresh_token = this.tokenServ.generateRefreshToken(user.email);
@@ -63,7 +67,7 @@ export class TokenController {
     user.refreshToken = hash_token;
 
     await this.data.transaction(async (manager) => {
-      await manager.save(user);
+      await manager.save(User, user);
     });
 
     res.cookie('access_token', access_token, {

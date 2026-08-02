@@ -21,6 +21,7 @@ import { UserService } from './user/user.service';
 import { WhatToWhatService } from './what-to-what/what-to-what.service';
 import { CustomConfigModule } from './custom-config/custom-config.module';
 import configuration from './config/config.config';
+import { WebSocketModule } from './web-socket/web-socket.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import configuration from './config/config.config';
     CommentReactModule,
     UserGqlModule,
     CustomConfigModule,
+    WebSocketModule,
   ],
   controllers: [AppController],
   providers: [

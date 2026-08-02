@@ -10,7 +10,7 @@ export class PolicyUpdate implements PolicyHandler {
   handler(ability: AppAbility, ctx: ExecutionContext) {
     const req = ctx.switchToHttp().getRequest<Request>();
     const user = req.user as User;
-    // Article id must be retrieved from frontend in order to fetch the article from the backend 
+    // Article id must be retrieved from req.bod, fetch from DB then pass the whole Article to can() or cannot() 
     const art = new Article();
     // Thus, this is just for testing purposes only, not to be utilized this way (making art.authorId = user.id;)
     art.authorId = user.id;

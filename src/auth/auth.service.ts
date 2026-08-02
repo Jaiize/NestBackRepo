@@ -47,12 +47,12 @@ export class AuthService {
   async cookieLogin(user: SignIn) {
     const access_token = this.tokenServ.generateCookieToken(user.login);
     const refresh_token = this.tokenServ.generateRefreshToken(user.login);
-    const hashToken: string = await bcrypt.hash(
+    const hashedToken: string = await bcrypt.hash(
       refresh_token,
       this.configServ.salt!,
     );
     const fetched_user = await this.userServ.findOneInternally(user.login);
-    fetched_user.refreshToken = hashToken;
+    fetched_user.refreshToken = hashedToken;
 
     await this.data.transaction(async (manager) => {
       await manager.save(fetched_user);

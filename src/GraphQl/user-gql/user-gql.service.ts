@@ -16,7 +16,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { GqlLocalAuthGuardService } from '../gql-local-auth-guard/gql-local-auth-guard.service';
 import { WhatToWhatService } from 'src/what-to-what/what-to-what.service';
 import { GraphQLResolveInfo } from 'graphql';
-import { Long } from 'typeorm';
+
 
 @Resolver(() => UserObj)
 export class UserGqlService {
@@ -33,7 +33,7 @@ export class UserGqlService {
     return users.map((u) => this.what.plainToInstance(UserObj, u));
   }
 
-  // Get user info with properties given from the client side!
+  // Get user info with properties given from the client side (FieldNodes)!
   @Query(() => UserObj, { name: 'user' })
   async getUser(@Args('cred') cred: string, @Info() inf: GraphQLResolveInfo) {
     const rawFields = inf.fieldNodes[0].selectionSet?.selections;
@@ -57,6 +57,7 @@ export class UserGqlService {
     await tokenAndUser.then((o) => {
       ctx.res.header('Authorization', `Bearer ${o?.token}`);
       ctx.res.json({ accessToken: o?.token, user: o?.user });
+      return { name: o?.user.name, accessToken: o?.token };
     });
   }
 
