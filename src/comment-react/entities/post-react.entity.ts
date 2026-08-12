@@ -14,7 +14,7 @@ import { ReactionType } from './comment-react.entity';
 
 
 @Entity()
-@Unique(['user', 'room'])
+@Unique(['ownerId', 'postId'])
 export class PostReact {
   @PrimaryGeneratedColumn()
   id!: number;

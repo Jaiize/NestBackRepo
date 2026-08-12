@@ -49,12 +49,4 @@ export class CreateRoomDto {
   @IsNotEmpty()
   rating!: number;
 
-  @ApiProperty({ description: 'Date created', type: 'string' })
-  @IsString()
-  @IsNotEmpty()
-  created_at!: Date;
-
-  @ApiProperty({ description: 'Date updated', type: 'string' })
-  @IsNotEmpty()
-  updated_at!: Date;
 }

@@ -17,6 +17,7 @@ import { WebSocketExceptFilter } from './WebSocketExceptFilter';
 
 export interface WsUser {
   id: string;
+  socketId: string;
   email: string;
   username: string;
   canPost: boolean;
@@ -25,7 +26,6 @@ export interface WsUser {
 
 @UseFilters(new WebSocketExceptFilter()) // Still in progress
 @WebSocketGateway({
-  // namespace: '/chat',
   cors: {
     origin: '*',
     credentials: true,
@@ -61,14 +61,15 @@ export class WebSocketGate implements OnGatewayConnection, OnGatewayDisconnect {
           email: user.email,
           canPost: user.canPost,
           isAdmin: user.isAdmin,
+          socketId: client.id,
         };
 
         client.emit('welcome', {
-          Message: 'Connected to NestJs application',
+          Message: 'Connected to Hotel-enventory application',
           user: (client.data as WsUser).username,
         });
         return {
-          echo: 'Connected to NestJs application',
+          echo: 'Connected to Hotel-enventory application',
           user: (client.data as WsUser).username,
         };
       }
@@ -133,6 +134,5 @@ export class WebSocketGate implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit('receive', { result: user });
     return { clientId: client.id, echo: user };
   }
-}
 
-// Download @types for websockets npm i @socket.io/redis-platform npm i redis
+}

@@ -28,11 +28,4 @@ export class CreateFileDto {
   @IsNotEmpty({ message: 'file type is required (e.g PDF, DOCX, JPEG)' })
   type!: string;
 
-  @ApiProperty({ type: 'string', description: 'Created date' })
-  @IsNotEmpty()
-  created_at!: Date;
-
-  @ApiProperty({ type: 'string', description: 'Updated date' })
-  @IsNotEmpty()
-  updated_at!: Date;
 }
