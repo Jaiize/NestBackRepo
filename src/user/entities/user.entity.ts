@@ -16,6 +16,7 @@ import { CommentReact } from 'src/comment-react/entities/comment-react.entity';
 import { PostReact } from 'src/comment-react/entities/post-react.entity';
 import { Gender } from 'src/GraphQl/user-gql/UserObj';
 import { Room } from 'src/rooms/entities/room.entity';
+import { Chat } from 'src/chat/entities/chat.entity';
 
 @Entity()
 export class User {
@@ -73,6 +74,9 @@ export class User {
 
   @OneToMany(() => PostReact, (postReact) => postReact.user)
   postlikes!: PostReact[];
+
+  @OneToMany(() => Chat, (chat) => chat.user)
+  chats!: Chat[];
 
   @CreateDateColumn({ type: 'timestamp', update: false })
   @Index()

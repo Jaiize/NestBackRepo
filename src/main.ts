@@ -16,7 +16,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('NestJS API for Hotel-inventory app')
     .setDescription(
-      'A large hotel app that supports following, follow back, make and reply to comments, react to posts (rooms), react to comments',
+      'A large hotel app that supports following, follow back, make comments and reply to comments, react to posts (rooms), react to comments and chat',
     )
     .setVersion('0.10.21')
     .addTag('nestjs')

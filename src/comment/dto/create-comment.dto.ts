@@ -14,10 +14,16 @@ export class CreateCommentDto {
   @IsNotEmpty()
   user!: User;
 
-  @ApiProperty({ type: 'string', description: 'Room commented on' })
+  @ApiProperty({
+    type: 'string',
+    description: 'Room id commented on for relation',
+  })
   @IsNotEmpty()
   room!: Room;
 
-  @ApiProperty({ type: 'string', description: 'Parent comment' })
+  @ApiProperty({
+    type: 'string',
+    description: 'Parent comment id for relation',
+  })
   parent!: CommentUser;
 }

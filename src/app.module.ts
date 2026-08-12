@@ -22,6 +22,7 @@ import { WhatToWhatService } from './what-to-what/what-to-what.service';
 import { CustomConfigModule } from './custom-config/custom-config.module';
 import configuration from './config/config.config';
 import { WebSocketModule } from './web-socket/web-socket.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { WebSocketModule } from './web-socket/web-socket.module';
     UserGqlModule,
     CustomConfigModule,
     WebSocketModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [
